@@ -184,6 +184,9 @@ def selected_row_to_singer_message(stream, row, version, columns, time_extracted
 
     rec = dict(zip(columns, row_to_persist))
 
+    if stream["tap_stream_id"] == "public-pages" and isinstance(rec.get("data", {}).get("main"), str):
+        rec["data"]["main"] == [rec["data"]["main"]]
+
     return singer.RecordMessage(
         stream=calculate_destination_stream_name(stream, md_map),
         record=rec,
