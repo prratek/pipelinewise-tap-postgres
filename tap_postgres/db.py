@@ -174,6 +174,25 @@ def selected_value_to_singer_value(elem, sql_datatype):
     return selected_value_to_singer_value_impl(elem, sql_datatype)
 
 
+def process_clay_public_pages_rec_dict(row: dict) -> dict:
+    if not isinstance(row.get("data", {}).get("main"), list):
+        row["data"]["main"] = [row["data"]["main"]]
+
+    if not isinstance(row["data"]["main"][0], str):
+        row["data"]["main"] = [str(item) for item in row["data"]["main"]]
+
+    if not isinstance(row.get("lastModified", ""), str):
+        row["lastModified"] = str(row["lastModified"])
+
+    return row
+
+
+def process_clay_rec_dict(row: dict, stream: dict) -> dict:
+    if stream["tap_stream_id"] == "public-pages":
+        return process_clay_public_pages_rec_dict(row)
+    return row
+
+
 # pylint: disable=too-many-arguments
 def selected_row_to_singer_message(stream, row, version, columns, time_extracted, md_map):
     row_to_persist = ()
@@ -182,10 +201,7 @@ def selected_row_to_singer_message(stream, row, version, columns, time_extracted
         cleaned_elem = selected_value_to_singer_value(elem, sql_datatype)
         row_to_persist += (cleaned_elem,)
 
-    rec = dict(zip(columns, row_to_persist))
-
-    if stream["tap_stream_id"] == "public-pages" and isinstance(rec.get("data", {}).get("main"), str):
-        rec["data"]["main"] == [rec["data"]["main"]]
+    rec = process_clay_rec_dict(dict(zip(columns, row_to_persist)), stream)
 
     return singer.RecordMessage(
         stream=calculate_destination_stream_name(stream, md_map),
