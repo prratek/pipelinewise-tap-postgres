@@ -174,6 +174,30 @@ def selected_value_to_singer_value(elem, sql_datatype):
     return selected_value_to_singer_value_impl(elem, sql_datatype)
 
 
+def process_clay_components_article_rec_dict(row: dict) -> dict:
+    try:
+        if row.get("data", {}).get("most-popular"):
+            row["data"]["most_popular"] = row["data"].pop("most-popular")
+
+        if row.get("data", {}).get("featureTypes"):
+            new_feature_types = {}
+            for k in row["data"]["featureTypes"]:
+                new_key = k.replace(" ", "_").replace("-", "_").replace("&", "n")
+                new_feature_types[new_key] = row["data"]["featureTypes"][k]
+            row["data"]["featureTypes"] = new_feature_types
+
+        if "tags" in row.get("data", {}) and not isinstance(row["data"]["tags"], dict):
+            row["data"].pop("tags")
+
+        if "overrideCreditRequired" in row.get("data", {}) and not isinstance(row["data"]["overrideCreditRequired"], bool):
+            row["data"]["overrideCreditRequired"] = bool(row["data"]["overrideCreditRequired"])
+
+    except AttributeError as e:
+        pass
+
+    return row
+
+
 def process_clay_public_pages_rec_dict(row: dict) -> dict:
     try:
         if row.get("data", {}).get("main") and isinstance(row.get("data", {}).get("main"), list):
@@ -188,7 +212,7 @@ def process_clay_public_pages_rec_dict(row: dict) -> dict:
                 row["data"]["main"] = [json.dumps(item) for item in row["data"]["main"]]
 
     except AttributeError as e:
-        pass
+        LOGGER.warning(f"Attribute Error cleaning row: {row}")
 
     if row.get("lastModified"):
         row.pop("lastModified")
@@ -206,6 +230,8 @@ def process_clay_public_pages_rec_dict(row: dict) -> dict:
 def process_clay_rec_dict(row: dict, stream: dict) -> dict:
     if stream["tap_stream_id"] == "public-pages":
         return process_clay_public_pages_rec_dict(row)
+    if stream["tap_stream_id"] == "components-article":
+        return process_clay_components_article_rec_dict(row)
     return row
 
 
