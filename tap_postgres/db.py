@@ -192,6 +192,18 @@ def process_clay_components_article_rec_dict(row: dict) -> dict:
         if "overrideCreditRequired" in row.get("data", {}) and not isinstance(row["data"]["overrideCreditRequired"], bool):
             row["data"]["overrideCreditRequired"] = bool(row["data"]["overrideCreditRequired"])
 
+        if "updatedOn" in row.get("data", {}):
+            if not isinstance(row["data"]["updatedOn"], list):
+                row["data"].pop("updatedOn")
+            else:
+                row["data"]["updatedOn"] = [val for val in row["data"]["updatedOn"] if isinstance(val, str)]
+
+        if "inArticleMobileAd" in row.get("data", {}) and not isinstance(row["data"]["inArticleMobileAd"], dict):
+            row["data"]["inArticleMobileAd"] = {"_ref": row["data"]["inArticleMobileAd"]}
+
+        if "inArticleTabletAd" in row.get("data", {}) and not isinstance(row["data"]["inArticleTabletAd"], dict):
+            row["data"]["inArticleTabletAd"] = {"_ref": row["data"]["inArticleTabletAd"]}
+
     except AttributeError as e:
         pass
 
