@@ -250,7 +250,7 @@ def process_clay_rec_dict(row: dict, stream: dict) -> dict:
         return process_clay_public_pages_rec_dict(row)
     if stream["tap_stream_id"] == "components-article":
         return process_clay_components_article_rec_dict(row)
-    if stream["tap-stream-id"] == "components-episode-recap":
+    if stream["tap_stream_id"] == "components-episode-recap":
         return process_cla
     return row
 
