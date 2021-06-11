@@ -175,7 +175,7 @@ def selected_value_to_singer_value(elem, sql_datatype):
 
 
 def process_clay_components_episode_recap_rec_dict(row: dict) -> dict:
-    if "showImageUrl" row.get("data", {}):
+    if "showImageUrl" in row.get("data", {}):
         row["data"].pop("showImageUrl")
     return row
 
