@@ -174,6 +174,12 @@ def selected_value_to_singer_value(elem, sql_datatype):
     return selected_value_to_singer_value_impl(elem, sql_datatype)
 
 
+def process_clay_components_episode_recap_rec_dict(row: dict) -> dict:
+    if "showImageUrl" row.get("data", {}):
+        row["data"].pop("showImageUrl")
+    return row
+
+
 def process_clay_components_article_rec_dict(row: dict) -> dict:
     try:
         if row.get("data", {}).get("most-popular"):
@@ -244,6 +250,8 @@ def process_clay_rec_dict(row: dict, stream: dict) -> dict:
         return process_clay_public_pages_rec_dict(row)
     if stream["tap_stream_id"] == "components-article":
         return process_clay_components_article_rec_dict(row)
+    if stream["tap-stream-id"] == "components-episode-recap":
+        return process_cla
     return row
 
 
