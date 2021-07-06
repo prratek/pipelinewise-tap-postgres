@@ -220,24 +220,25 @@ def process_clay_public_pages_rec_dict(row: dict) -> dict:
     try:
         if row.get("data", {}).get("main") and isinstance(row.get("data", {}).get("main"), list):
             if isinstance(row["data"]["main"][0], dict):
-                LOGGER.warning(f"Converting data.main from List[dict] to List[str]: {row}")
+                # LOGGER.warning(f"Converting data.main from List[dict] to List[str]: {row}")
                 row["data"]["main"] = [json.dumps(item) for item in row["data"]["main"]]
 
         if row.get("data", {}).get("main") and not isinstance(row.get("data", {}).get("main"), list):
-            LOGGER.warning(f"Converting data.main to list: {row}")
+            # LOGGER.warning(f"Converting data.main to list: {row}")
             row["data"]["main"] = [row["data"]["main"]]
             if not isinstance(row["data"]["main"][0], str):
                 row["data"]["main"] = [json.dumps(item) for item in row["data"]["main"]]
 
     except AttributeError as e:
-        LOGGER.warning(f"Attribute Error cleaning row: {row}")
+        pass
+        # LOGGER.warning(f"Attribute Error cleaning row: {row}")
 
     if row.get("lastModified"):
         row.pop("lastModified")
 
     try:
         if row.get("meta", {}).get("authors"):
-            LOGGER.warning(f"Removing non str entries in meta.authors: {row}")
+            # LOGGER.warning(f"Removing non str entries in meta.authors: {row}")
             row["meta"]["authors"] = [author for author in row["meta"]["authors"] if isinstance(author, str)]
     except AttributeError as e:
         pass
