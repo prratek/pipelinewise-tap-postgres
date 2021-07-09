@@ -174,6 +174,28 @@ def selected_value_to_singer_value(elem, sql_datatype):
     return selected_value_to_singer_value_impl(elem, sql_datatype)
 
 
+def fix_clay_components_article_bad_ints(row: dict) -> dict:
+    if "byline" in row.get("data", {}):
+        for i_b, byline in enumerate(row["data"]["byline"]):
+            if "names" in byline:
+                for i_n, name in enumerate(byline["names"]):
+                    if "count" in name and name["count"] == '':
+                        row["data"]["byline"][i_b]["names"][i_n]["count"] = 0
+
+    if "rollingStandoutCount" in row.get("data", {}) and row["data"]["rollingStandoutCount"] == '':
+        row["data"]["rollingStandoutCount"] = 0
+
+    if "magazineIssueOrder" in row.get("data", {}) and row["data"]["magazineIssueOrder"] == '':
+        row["data"]["magazineIssueOrder"] = 0
+
+    if "secondaryAttribution" in row.get("data", {}):
+        for i, attribution in enumerate(row["data"]["secondaryAttribution"]):
+            if "count" in attribution and attribution["count"] == '':
+                row["data"]["secondaryAttribution"][i]["count"] = 0
+
+    return row
+
+
 def process_clay_components_episode_recap_rec_dict(row: dict) -> dict:
     if "showImageUrl" in row.get("data", {}):
         row["data"].pop("showImageUrl")
@@ -209,6 +231,8 @@ def process_clay_components_article_rec_dict(row: dict) -> dict:
 
         if "inArticleTabletAd" in row.get("data", {}) and not isinstance(row["data"]["inArticleTabletAd"], dict):
             row["data"]["inArticleTabletAd"] = {"_ref": row["data"]["inArticleTabletAd"]}
+
+        row = fix_clay_components_article_bad_ints(row)
 
     except AttributeError as e:
         pass
