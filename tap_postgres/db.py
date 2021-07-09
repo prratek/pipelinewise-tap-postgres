@@ -175,9 +175,9 @@ def selected_value_to_singer_value(elem, sql_datatype):
 
 
 def fix_clay_components_article_bad_ints(row: dict) -> dict:
-    if "byline" in row.get("data", {}):
+    if "byline" in row.get("data", {}) and isinstance(row["data"]["byline"], list):
         for i_b, byline in enumerate(row["data"]["byline"]):
-            if "names" in byline:
+            if "names" in byline and isinstance(byline["names"], list):
                 for i_n, name in enumerate(byline["names"]):
                     if "count" in name and name["count"] == '':
                         row["data"]["byline"][i_b]["names"][i_n]["count"] = 0
@@ -188,7 +188,7 @@ def fix_clay_components_article_bad_ints(row: dict) -> dict:
     if "magazineIssueOrder" in row.get("data", {}) and row["data"]["magazineIssueOrder"] == '':
         row["data"]["magazineIssueOrder"] = 0
 
-    if "secondaryAttribution" in row.get("data", {}):
+    if "secondaryAttribution" in row.get("data", {}) and isinstance(row["data"]["secondaryAttribution"], list):
         for i, attribution in enumerate(row["data"]["secondaryAttribution"]):
             if "count" in attribution and attribution["count"] == '':
                 row["data"]["secondaryAttribution"][i]["count"] = 0
