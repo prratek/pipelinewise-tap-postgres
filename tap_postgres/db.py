@@ -293,7 +293,8 @@ def process_clay_components_product_rec_dict(row: dict) -> dict:
 
 
 def process_clay_rec_dict(row: dict, stream: dict) -> dict:
-    row["data"] = nullify_empty_str_keys(row["data"])
+    if isinstance(row.get("data"), dict):
+        row["data"] = nullify_empty_str_keys(row["data"])
     if stream["tap_stream_id"] == "public-pages":
         return process_clay_public_pages_rec_dict(row)
     if stream["tap_stream_id"] == "components-article":
