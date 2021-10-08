@@ -270,22 +270,21 @@ def process_clay_public_pages_rec_dict(row: dict) -> dict:
     return row
 
 
-def pop_empty_str_keys(d: dict) -> dict:
+def nullify_empty_str_keys(d: dict) -> dict:
     for k, v in d.items():
         if v == "":
             d[k] = None
         if isinstance(v, dict):
-            d[k] = pop_empty_str_keys(d[k])
+            d[k] = nullify_empty_str_keys(d[k])
         if isinstance(v, list):
             for i, item in enumerate(v):
                 if isinstance(item, dict):
-                    d[k][i] = pop_empty_str_keys(d[k][i])
+                    d[k][i] = nullify_empty_str_keys(d[k][i])
 
     return d
 
 
 def process_clay_components_product_rec_dict(row: dict) -> dict:
-    row["data"] = pop_empty_str_keys(row["data"])
     if isinstance(row["data"].get("agora", {}).get("merchants"), dict):
         row["data"]["agora"]["merchants"] = [row["data"]["agora"]["merchants"]]
     if isinstance(row["data"].get("agora", {}).get("locales"), dict):
@@ -294,6 +293,7 @@ def process_clay_components_product_rec_dict(row: dict) -> dict:
 
 
 def process_clay_rec_dict(row: dict, stream: dict) -> dict:
+    row["data"] = nullify_empty_str_keys(row["data"])
     if stream["tap_stream_id"] == "public-pages":
         return process_clay_public_pages_rec_dict(row)
     if stream["tap_stream_id"] == "components-article":
